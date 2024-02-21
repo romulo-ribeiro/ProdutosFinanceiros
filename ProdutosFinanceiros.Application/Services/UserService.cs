@@ -13,5 +13,27 @@ namespace ProdutosFinanceiros.Application.Services
             IValidator<User> validator) : base(repository, validator)
         {
         }
+
+        public async Task<Result<User>> GetByUsernameAsync(string username)
+        {
+            var result = new Result<User>();
+            var entity = await _repository.GetByUsernameAsync(username);
+            if (entity is null)
+            {
+                result.Errors.Add("User not found");
+            }
+            else
+            {
+                result.IsValid = true;
+                result.Entity = entity;
+            }
+            return result;
+        }
+
+
+        public async Task<bool> ValidateCredentials(string username, string password)
+        {
+            return await _repository.CheckCredentials(username, password);
+        }
     }
 }

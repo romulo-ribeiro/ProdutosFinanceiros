@@ -10,6 +10,10 @@ namespace ProdutosFinanceiros.Infra.Context
         {
         }
 
+        public MainContext()
+        {
+        }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder) =>
             modelBuilder.ApplyConfigurationsFromAssembly(typeof(MainContext).Assembly);
 

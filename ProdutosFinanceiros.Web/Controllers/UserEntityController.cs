@@ -4,9 +4,9 @@ using ProdutosFinanceiros.Domain.Interfaces;
 
 namespace ProdutosFinanceiros.Web.Controllers;
 
-public class UserController : BaseCRUDController<User, IUserRepository, IUserService>
+public class UserEntityController : BaseCRUDController<User, IUserRepository, IUserService>
 {
-    public UserController(IUserService userService) : base(userService)
+    public UserEntityController(IUserService userService) : base(userService)
     {
     }
 }

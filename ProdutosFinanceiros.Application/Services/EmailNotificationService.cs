@@ -1,26 +1,33 @@
 using System.Text;
 using Microsoft.Extensions.Hosting;
+using ProdutosFinanceiros.Domain.Interfaces;
 
 namespace ProdutosFinanceiros.Application.Services;
 
-public class EmailNotificationService : IHostedService
+public class EmailNotificationService : BackgroundService, IHostedService
 {
+    private readonly IInvestmentWalletFinancialProductRepository _investmentWalletFinancialProductRepository;
+    private readonly IUserRepository _userRepository;
     private readonly string _senderEmail;
 
-    public EmailNotificationService()
+    public EmailNotificationService(
+        IInvestmentWalletFinancialProductRepository investmentWalletFinancialProductRepository,
+        IUserRepository userRepository)
     {
+        _userRepository = userRepository;
+        _investmentWalletFinancialProductRepository = investmentWalletFinancialProductRepository;
         _senderEmail = "produtofinanceiro@xp.com";
     }
 
     public Task StartAsync(CancellationToken cancellationToken)
     {
         Console.WriteLine("Email notification service has started.");
-        return StartSendingNotifications(cancellationToken);
+        return ExecuteAsync(cancellationToken);
     }
 
-    public async Task StartSendingNotifications(CancellationToken cancellationToken)
+    public void StartSendingNotifications(CancellationToken cancellationToken)
     {
-        await Task.Run(async () =>
+        Task.Run(() =>
         {
             while (!cancellationToken.IsCancellationRequested)
             {
@@ -38,7 +45,7 @@ public class EmailNotificationService : IHostedService
                 Console.WriteLine($"Next notification email in: {timeUntilNextNotification}");
 
                 // Wait until the next notification time or until cancellation is requested
-                await Task.Delay(timeUntilNextNotification, cancellationToken);
+                Task.Delay(timeUntilNextNotification, cancellationToken).GetAwaiter().GetResult();
 
                 // Check if cancellation is requested before sending the notification email
                 if (cancellationToken.IsCancellationRequested)
@@ -47,16 +54,17 @@ public class EmailNotificationService : IHostedService
                 }
 
                 // Send the notification email
-                await SendNotificationEmail();
+                SendNotificationEmail().GetAwaiter().GetResult();
 
                 // Wait for 24 hours before sending the next notification or until cancellation is requested
-                await Task.Delay(TimeSpan.FromHours(24), cancellationToken);
+                Task.Delay(TimeSpan.FromHours(24), cancellationToken).GetAwaiter().GetResult();
             }
-        }, cancellationToken);
+        });
     }
 
     public Task StopAsync(CancellationToken cancellationToken)
     {
+        Dispose();
         Console.WriteLine("Email notification service has stopped");
         return Task.CompletedTask;
     }
@@ -83,14 +91,26 @@ public class EmailNotificationService : IHostedService
     private async Task<string> GetEmailBodyMessage()
     {
         StringBuilder message = new StringBuilder();
-        message.AppendLine("Hello,");
-        message.AppendLine("This is a notification email.");
-        message.AppendLine("Please take note of the following information:");
-        message.AppendLine("- Notification 1");
-        message.AppendLine("- Notification 2");
-        message.AppendLine("- Notification 3");
+        var managers = await _userRepository.GetManagers();
+        foreach (var manager in managers)
+        {
+            var closingFinancialProducts = await _investmentWalletFinancialProductRepository.GetClosingFinancialProducts(manager.Id);
+            message.AppendLine("Hello,");
+            message.AppendLine("This is a notification email.");
+            message.AppendLine("Please take note of the following information:");
+            foreach (var entry in closingFinancialProducts)
+            {
+                message.AppendLine(entry);
+            }
+        }
         return message.ToString();
         
+    }
+
+    protected override Task ExecuteAsync(CancellationToken cancellationToken)
+    {
+        StartSendingNotifications(cancellationToken);
+        return Task.CompletedTask;
     }
 }
 

@@ -5,4 +5,5 @@ public class InvestmentWalletFinancialProduct : Entity
     public Guid InvestmentWalletId { get; set; }
     public virtual FinancialProduct FinancialProduct { get; set; }
     public Guid FinancialProductId { get; set; }
+    public int Quantity { get; set; }
 }

@@ -1,9 +1,10 @@
-using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
 using ProdutosFinanceiros.Application.Services;
 using ProdutosFinanceiros.Infra.Context;
 using ProdutosFinanceiros.Infra.Helpers;
+using ProdutosFinanceiros.Web.Handlers;
 using Swashbuckle.AspNetCore.SwaggerUI;
 
 namespace ProdutosFinanceiros.Web
@@ -19,23 +20,55 @@ namespace ProdutosFinanceiros.Web
 
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddSwaggerGen(c =>
+            try
             {
-                c.SwaggerDoc("v1", new OpenApiInfo
+                services.AddSwaggerGen(c =>
                 {
-                    Title = "Projeto Produtos Financeiros",
-                    Version = "v1",
+                    c.SwaggerDoc("v1", new OpenApiInfo
+                    {
+                        Title = "Projeto Produtos Financeiros",
+                        Version = "v1",
+                    });
+                    c.AddSecurityDefinition("basic", new OpenApiSecurityScheme
+                    {
+                        Name = "Authorization",
+                        Type = SecuritySchemeType.Http,
+                        Scheme = "basic",
+                        In = ParameterLocation.Header,
+                        Description = "Authorization header using the Bearer scheme."
+                    });
+                    c.AddSecurityRequirement(new OpenApiSecurityRequirement
+                    {
+                    {
+                          new OpenApiSecurityScheme
+                            {
+                                Reference = new OpenApiReference
+                                {
+                                    Type = ReferenceType.SecurityScheme,
+                                    Id = "basic"
+                                }
+                            },
+                            new string[] {}
+                    }
+                    });
                 });
-            });
-            AddDbContextCollection(services);
-            services.AddControllers();
-            services.AddCors();
-            services.AddHostedService<EmailNotificationService>();
+                AddDbContextCollection(services);
+                services.AddControllers();
+                services.AddCors();
 
-            DependencyInjection.AddInfrastructure(services, Configuration);
+                services.AddAuthentication("BasicAuthentication")
+                    .AddScheme<AuthenticationSchemeOptions, AuthenticationHandler>("BasicAuthentication", null);
+
+                services.AddHostedService<EmailNotificationService>();
+                DependencyInjection.AddInfrastructure(services, Configuration);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
         }
 
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, RoleManager<IdentityRole> roleManager)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
             app.UseSwagger();
             app.UseSwaggerUI(c =>
@@ -49,10 +82,14 @@ namespace ProdutosFinanceiros.Web
                 app.UseDeveloperExceptionPage();
             }
 
+            var serverUrls = Configuration["ASPNETCORE_URLS"] ?? "Not Found";
+            Console.WriteLine($"Server URLs: {serverUrls}");
+
             app.UseHttpsRedirection();
 
             app.UseRouting();
 
+            app.UseAuthentication();
             app.UseAuthorization();
 
             app.UseEndpoints(endpoints => { endpoints.MapControllers(); });

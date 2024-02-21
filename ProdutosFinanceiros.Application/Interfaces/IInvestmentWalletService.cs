@@ -5,5 +5,5 @@ namespace ProdutosFinanceiros.Application.Interfaces;
 
 public interface IInvestmentWalletService : IBaseService<InvestmentWallet, IInvestmentWalletRepository>
 {
-
+    public Task<string> GetUserWalletExtract(Guid userId);
 }

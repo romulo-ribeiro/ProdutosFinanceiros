@@ -12,8 +12,8 @@ using ProdutosFinanceiros.Infra.Context;
 namespace ProdutosFinanceiros.Infra.Migrations
 {
     [DbContext(typeof(MainContext))]
-    [Migration("20240220195311_AddInitialMigration")]
-    partial class AddInitialMigration
+    [Migration("20240221170312_ShiftedColumns")]
+    partial class ShiftedColumns
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -32,10 +32,13 @@ namespace ProdutosFinanceiros.Infra.Migrations
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
+                        .HasColumnType("uniqueidentifier")
+                        .HasDefaultValueSql("NEWID()");
 
                     b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime2")
+                        .HasDefaultValueSql("GETDATE()");
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -44,9 +47,6 @@ namespace ProdutosFinanceiros.Infra.Migrations
                     b.Property<DateTime>("PaymentDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<int>("Quantity")
-                        .HasColumnType("int");
-
                     b.Property<int>("Type")
                         .HasColumnType("int");
 
@@ -54,12 +54,7 @@ namespace ProdutosFinanceiros.Infra.Migrations
                         .HasPrecision(5)
                         .HasColumnType("decimal(5,2)");
 
-                    b.Property<Guid>("WalletFinancialProductId")
-                        .HasColumnType("uniqueidentifier");
-
                     b.HasKey("Id");
-
-                    b.HasIndex("WalletFinancialProductId");
 
                     b.ToTable("FinancialProduct");
                 });
@@ -68,10 +63,13 @@ namespace ProdutosFinanceiros.Infra.Migrations
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
+                        .HasColumnType("uniqueidentifier")
+                        .HasDefaultValueSql("NEWID()");
 
                     b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime2")
+                        .HasDefaultValueSql("GETDATE()");
 
                     b.Property<Guid>("ManagerId")
                         .HasColumnType("uniqueidentifier");
@@ -82,7 +80,7 @@ namespace ProdutosFinanceiros.Infra.Migrations
                     b.Property<Guid>("UserId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid>("WalletFinancialProductId")
+                    b.Property<Guid?>("WalletFinancialProductId")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("WalletNumber")
@@ -104,10 +102,13 @@ namespace ProdutosFinanceiros.Infra.Migrations
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
+                        .HasColumnType("uniqueidentifier")
+                        .HasDefaultValueSql("NEWID()");
 
                     b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime2")
+                        .HasDefaultValueSql("GETDATE()");
 
                     b.Property<Guid>("FinancialProductId")
                         .HasColumnType("uniqueidentifier");
@@ -117,6 +118,9 @@ namespace ProdutosFinanceiros.Infra.Migrations
 
                     b.Property<string>("Name")
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("Quantity")
+                        .HasColumnType("int");
 
                     b.HasKey("Id");
 
@@ -131,15 +135,13 @@ namespace ProdutosFinanceiros.Infra.Migrations
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
+                        .HasColumnType("uniqueidentifier")
+                        .HasDefaultValueSql("NEWID()");
 
                     b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("Discriminator")
-                        .IsRequired()
-                        .HasMaxLength(8)
-                        .HasColumnType("nvarchar(8)");
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime2")
+                        .HasDefaultValueSql("GETDATE()");
 
                     b.Property<string>("Email")
                         .IsRequired()
@@ -162,33 +164,11 @@ namespace ProdutosFinanceiros.Infra.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("User");
-
-                    b.HasDiscriminator<string>("Discriminator").HasValue("User");
-
-                    b.UseTphMappingStrategy();
-                });
-
-            modelBuilder.Entity("ProdutosFinanceiros.Domain.Manager", b =>
-                {
-                    b.HasBaseType("ProdutosFinanceiros.Domain.User");
-
-                    b.HasDiscriminator().HasValue("Manager");
-                });
-
-            modelBuilder.Entity("ProdutosFinanceiros.Domain.FinancialProduct", b =>
-                {
-                    b.HasOne("ProdutosFinanceiros.Domain.InvestmentWalletFinancialProduct", "WalletFinancialProduct")
-                        .WithMany()
-                        .HasForeignKey("WalletFinancialProductId")
-                        .OnDelete(DeleteBehavior.NoAction)
-                        .IsRequired();
-
-                    b.Navigation("WalletFinancialProduct");
                 });
 
             modelBuilder.Entity("ProdutosFinanceiros.Domain.InvestmentWallet", b =>
                 {
-                    b.HasOne("ProdutosFinanceiros.Domain.Manager", "Manager")
+                    b.HasOne("ProdutosFinanceiros.Domain.User", "Manager")
                         .WithMany()
                         .HasForeignKey("ManagerId")
                         .OnDelete(DeleteBehavior.NoAction)
@@ -203,8 +183,7 @@ namespace ProdutosFinanceiros.Infra.Migrations
                     b.HasOne("ProdutosFinanceiros.Domain.InvestmentWalletFinancialProduct", "WalletFinancialProduct")
                         .WithMany()
                         .HasForeignKey("WalletFinancialProductId")
-                        .OnDelete(DeleteBehavior.NoAction)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.NoAction);
 
                     b.Navigation("Manager");
 

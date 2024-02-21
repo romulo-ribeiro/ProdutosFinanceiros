@@ -9,8 +9,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ProdutosFinanceiros.Domain"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ProdutosFinanceiros.Infra", "ProdutosFinanceiros.Infra\ProdutosFinanceiros.Infra.csproj", "{B4BE3D8C-7554-4E19-9873-D0B63A573127}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ProdutosFinanceiros.Tests", "ProdutosFinanceiros.Tests\ProdutosFinanceiros.Tests.csproj", "{3A047E19-7425-4E11-A5E1-215FFD7878F2}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ProdutosFinanceiros.Web", "ProdutosFinanceiros.Web\ProdutosFinanceiros.Web.csproj", "{9D06D83D-A9FC-4C9D-8E29-424CD8CAB003}"
 EndProject
 Global

@@ -10,7 +10,6 @@ public class Entity : IEntity
 
     public Entity()
     {
-        Id = Guid.NewGuid();
         CreatedAt = DateTime.Now;
     }
 

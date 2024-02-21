@@ -22,5 +22,9 @@ public class User : Entity
     public void SetCustomer()
     {
         Type = UserType.Customer;
+    }
+
+    public void SetAdmin(){
+        Type = UserType.Admin;
     }   
 }

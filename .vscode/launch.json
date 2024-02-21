@@ -10,6 +10,7 @@
             "args": [],
             "cwd": "${workspaceFolder}/ProdutosFinanceiros.Web",
             "stopAtEntry": false,
+            "url": "https://localhost:5001",
             "serverReadyAction": {
                 "action": "openExternally",
                 "pattern": "^\\s*Now listening on:\\s+(https?://\\S+)"

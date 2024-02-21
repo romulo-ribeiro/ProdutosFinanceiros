@@ -23,6 +23,8 @@ namespace ProdutosFinanceiros.Web
             services.AddScoped<IInvestmentWalletRepository, InvestmentWalletRepository>();
             services.AddScoped<IInvestmentWalletService, InvestmentWalletService>();
             services.AddScoped<IValidator<InvestmentWallet>, InvestmentWalletValidator>();
+
+            services.AddScoped<IInvestmentWalletFinancialProductRepository, InvestmentWalletFinancialProductRepository>();
         }
     }
 }

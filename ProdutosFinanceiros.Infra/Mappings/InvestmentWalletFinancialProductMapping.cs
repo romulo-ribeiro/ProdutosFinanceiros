@@ -10,6 +10,8 @@ public class InvestmentWalletFinancialProductMapping : IEntityTypeConfiguration<
         builder.HasKey(q => q.Id);
         builder.HasOne(q => q.FinancialProduct).WithMany().HasForeignKey(q => q.FinancialProductId).OnDelete(DeleteBehavior.NoAction);
         builder.HasOne(q => q.InvestmentWallet).WithMany().HasForeignKey(q => q.InvestmentWalletId).OnDelete(DeleteBehavior.NoAction);
-        builder.Property(q => q.CreatedAt).IsRequired();
+        builder.Property(q => q.Id).IsRequired().HasDefaultValueSql("NEWID()");
+        builder.Property(q => q.Quantity).IsRequired();
+        builder.Property(q => q.CreatedAt).IsRequired().HasDefaultValueSql("GETDATE()");;
     }
 }

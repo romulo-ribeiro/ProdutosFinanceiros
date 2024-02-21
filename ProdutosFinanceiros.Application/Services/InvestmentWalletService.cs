@@ -12,4 +12,9 @@ public class InvestmentWalletService : BaseService<InvestmentWallet, IInvestment
         IValidator<InvestmentWallet> validator) : base(repository, validator)
     {
     }
+
+    public Task<string> GetUserWalletExtract(Guid userId)
+    {
+        return _repository.GetUserWalletExtract(userId);
+    }
 }

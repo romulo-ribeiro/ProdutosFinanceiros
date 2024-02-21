@@ -6,8 +6,8 @@ public class InvestmentWallet : Entity
     public Guid UserId { get; set; }
     public virtual User Manager { get; set; }
     public Guid ManagerId { get; set; }
-    public virtual InvestmentWalletFinancialProduct WalletFinancialProduct { get; set; }
-    public Guid WalletFinancialProductId { get; set; }
+    public virtual InvestmentWalletFinancialProduct? WalletFinancialProduct { get; set; }
+    public Guid? WalletFinancialProductId { get; set; }
 
     public InvestmentWallet()
     {

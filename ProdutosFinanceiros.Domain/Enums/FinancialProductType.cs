@@ -8,5 +8,5 @@ public enum FinancialProductType
     ForeingExchange = 5,
     TreasureBond = 6,
     SavingsAccount = 7,
-    CertificateOfDeposit = 7,
+    CertificateOfDeposit = 8,
 }

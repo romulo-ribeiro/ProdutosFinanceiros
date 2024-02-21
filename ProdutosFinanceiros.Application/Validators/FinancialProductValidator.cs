@@ -26,13 +26,5 @@ public class FinancialProductValidator : AbstractValidator<FinancialProduct>, IV
         RuleFor(x => x.Value)
             .GreaterThan(0m)
             .WithMessage("Value is invalid");
-
-        RuleFor(x => x.Quantity)
-            .NotEmpty()
-            .WithMessage("Quantity is required");
-
-        RuleFor(x => x.Quantity)
-            .GreaterThanOrEqualTo(1)
-            .WithMessage("Quantity must be greater than or equal 1");
     }
 }
