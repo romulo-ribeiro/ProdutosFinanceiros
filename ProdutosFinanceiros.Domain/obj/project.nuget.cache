@@ -1,8 +1,10 @@
 {
   "version": 2,
-  "dgSpecHash": "t6NUPypy7Pm3P39gSqKGrMctHEM9SViObMM1kPnkM3tPq1W2KeNYNWy5ZK0fGfPUI3kVpdHbWawop04/ZAyH4g==",
+  "dgSpecHash": "xMMIrb6hfcwkoAs++h4wLa2Zt5H4lmOp/fPsqbqO+6wppi70ERmycfF1WeaoAHdFySCmGBDcj6es7zVEKJEIiA==",
   "success": true,
   "projectFilePath": "C:\\Projetos\\ProdutosFinanceiros\\ProdutosFinanceiros.Domain\\ProdutosFinanceiros.Domain.csproj",
-  "expectedPackageFiles": [],
+  "expectedPackageFiles": [
+    "C:\\Users\\romul\\.nuget\\packages\\fluentvalidation\\11.9.0\\fluentvalidation.11.9.0.nupkg.sha512"
+  ],
   "logs": []
 }
