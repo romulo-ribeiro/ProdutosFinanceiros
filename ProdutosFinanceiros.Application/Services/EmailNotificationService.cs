@@ -1,4 +1,5 @@
 using System.Text;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using ProdutosFinanceiros.Domain.Interfaces;
 
@@ -6,23 +7,27 @@ namespace ProdutosFinanceiros.Application.Services;
 
 public class EmailNotificationService : BackgroundService, IHostedService
 {
-    private readonly IInvestmentWalletFinancialProductRepository _investmentWalletFinancialProductRepository;
-    private readonly IUserRepository _userRepository;
+    private readonly IServiceScopeFactory _serviceScopeFactory;
     private readonly string _senderEmail;
+    private IInvestmentWalletFinancialProductRepository _iwfpRepository;
+    private IUserRepository _uRepository;
 
     public EmailNotificationService(
-        IInvestmentWalletFinancialProductRepository investmentWalletFinancialProductRepository,
-        IUserRepository userRepository)
+        IServiceScopeFactory serviceScopeFactory)
     {
-        _userRepository = userRepository;
-        _investmentWalletFinancialProductRepository = investmentWalletFinancialProductRepository;
+        _serviceScopeFactory = serviceScopeFactory;
         _senderEmail = "produtofinanceiro@xp.com";
     }
 
     public Task StartAsync(CancellationToken cancellationToken)
     {
-        Console.WriteLine("Email notification service has started.");
-        return ExecuteAsync(cancellationToken);
+        using (var scope = _serviceScopeFactory.CreateScope())
+        {
+            _iwfpRepository = scope.ServiceProvider.GetRequiredService<IInvestmentWalletFinancialProductRepository>();
+            _uRepository = scope.ServiceProvider.GetRequiredService<IUserRepository>();
+            Console.WriteLine("Email notification service has started.");
+            return ExecuteAsync(cancellationToken);
+        }
     }
 
     public void StartSendingNotifications(CancellationToken cancellationToken)
@@ -91,10 +96,10 @@ public class EmailNotificationService : BackgroundService, IHostedService
     private async Task<string> GetEmailBodyMessage()
     {
         StringBuilder message = new StringBuilder();
-        var managers = await _userRepository.GetManagers();
+        var managers = await _uRepository.GetManagers();
         foreach (var manager in managers)
         {
-            var closingFinancialProducts = await _investmentWalletFinancialProductRepository.GetClosingFinancialProducts(manager.Id);
+            var closingFinancialProducts = await _iwfpRepository.GetClosingFinancialProducts(manager.Id);
             message.AppendLine("Hello,");
             message.AppendLine("This is a notification email.");
             message.AppendLine("Please take note of the following information:");
@@ -104,7 +109,7 @@ public class EmailNotificationService : BackgroundService, IHostedService
             }
         }
         return message.ToString();
-        
+
     }
 
     protected override Task ExecuteAsync(CancellationToken cancellationToken)

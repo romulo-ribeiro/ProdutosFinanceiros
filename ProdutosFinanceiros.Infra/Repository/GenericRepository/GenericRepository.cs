@@ -8,12 +8,12 @@ namespace ProdutosFinanceiros.Infra.Repository.GenericRepository
     public abstract class GenericRepository<TEntity>
         : IGenericRepository<TEntity> where TEntity : Entity
     {
-        private readonly MainContext _dbContext;
+        protected readonly MainContext dbContext;
         protected readonly DbSet<TEntity> DbSet;
 
         public GenericRepository(MainContext dbContext)
         {
-            _dbContext = dbContext;
+            this.dbContext = dbContext;
             DbSet = dbContext.Set<TEntity>();
         }
 
@@ -22,7 +22,7 @@ namespace ProdutosFinanceiros.Infra.Repository.GenericRepository
             var entity = await DbSet.FindAsync(id);
             if (entity != null)
             {
-                _dbContext.Entry(entity).State = EntityState.Detached;
+                dbContext.Entry(entity).State = EntityState.Detached;
             }
             return entity;
         }
@@ -30,19 +30,19 @@ namespace ProdutosFinanceiros.Infra.Repository.GenericRepository
         public async Task CreateAsync(TEntity entity)
         {
             DbSet.Add(entity);
-            await _dbContext.SaveChangesAsync();
+            await dbContext.SaveChangesAsync();
         }
 
         public async Task UpdateAsync(TEntity entity)
         {
-            _dbContext.Entry(entity).State = EntityState.Modified;
-            await _dbContext.SaveChangesAsync();
+            dbContext.Entry(entity).State = EntityState.Modified;
+            await dbContext.SaveChangesAsync();
         }
 
         public async Task<bool> DeleteAsync(Guid id)
         {
             DbSet.Remove(await DbSet.FindAsync(id));
-            await _dbContext.SaveChangesAsync();
+            await dbContext.SaveChangesAsync();
             return true;
         }
 

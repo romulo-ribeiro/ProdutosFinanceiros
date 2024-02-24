@@ -9,32 +9,32 @@ namespace ProdutosFinanceiros.Infra.Repository;
 
 public class InvestmentWalletRepository : GenericRepository<InvestmentWallet>, IInvestmentWalletRepository
 {
-    private IFinancialProductRepository _fpRepository;
-    private IInvestmentWalletFinancialProductRepository _iwfpRepository;
-
     public InvestmentWalletRepository(
-        MainContext dbContext,
-        IFinancialProductRepository fpRepository,
-        IInvestmentWalletFinancialProductRepository iwfpRepository) : base(dbContext)
+        MainContext dbContext) : base(dbContext)
     {
-        _fpRepository = fpRepository;
-        _iwfpRepository = iwfpRepository;
     }
 
     public async Task<string> GetUserWalletExtract(Guid userId)
     {
-        var result = await DbSet
-            .Where(x => x.User.Id == userId)
-            .Select(x => new
-            {
-                x.WalletNumber,
-                x.User.Name,
-                x.WalletFinancialProduct.CreatedAt,
-                Amount = x.WalletFinancialProduct.Quantity * x.WalletFinancialProduct.FinancialProduct.Value,
-                FinancialProductName = x.WalletFinancialProduct.FinancialProduct.Name,
-            })
-            .OrderByDescending(x => x.CreatedAt).ToListAsync();
+        var iwfpRepository = dbContext.Set<InvestmentWalletFinancialProduct>().AsNoTracking();
+        var fpRepository = dbContext.Set<FinancialProduct>().AsNoTracking();
+        var uRepository = dbContext.Set<User>().AsNoTracking();
 
-        return JsonConvert.SerializeObject(result);
+        var result = from iw in DbSet
+             join iwfp in iwfpRepository on iw.Id equals iwfp.InvestmentWalletId
+             join fp in fpRepository on iwfp.FinancialProductId equals fp.Id
+             join u in uRepository on iw.UserId equals u.Id
+             where u.Id == userId
+             orderby iwfp.CreatedAt descending
+             select new
+             {
+                 u.Name,
+                 iw.WalletNumber,
+                 ProductName = fp.Name,
+                 Amount = fp.Value * iwfp.Quantity,
+                 iwfp.CreatedAt
+             };
+             
+        return JsonConvert.SerializeObject(result.ToList());
     }
 }
