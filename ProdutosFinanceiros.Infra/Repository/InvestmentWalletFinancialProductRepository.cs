@@ -1,4 +1,5 @@
-﻿using ProdutosFinanceiros.Domain;
+﻿using Microsoft.EntityFrameworkCore;
+using ProdutosFinanceiros.Domain;
 using ProdutosFinanceiros.Domain.Interfaces;
 using ProdutosFinanceiros.Infra.Context;
 using ProdutosFinanceiros.Infra.Repository.GenericRepository;
@@ -11,8 +12,22 @@ public class InvestmentWalletFinancialProductRepository : GenericRepository<Inve
     {
     }
 
+
     public Task<List<string>> GetClosingFinancialProducts(Guid managerId)
     {
-        throw new NotImplementedException();
+        DateTime currentDate = DateTime.Now;
+        int currentMonth = currentDate.Month;
+
+        var query = from iwfp in dbContext.Set<InvestmentWalletFinancialProduct>()
+                    where iwfp.FinancialProduct.PaymentDate.Month == currentMonth
+                    where iwfp.InvestmentWallet.ManagerId == managerId
+                    orderby iwfp.FinancialProduct.PaymentDate
+                    select
+$@"WalletNumber: {iwfp.InvestmentWallet.WalletNumber} -
+ProductName: {iwfp.FinancialProduct.Name} -
+PaymentDate: {iwfp.FinancialProduct.PaymentDate:dd/MM} -
+Amount: {iwfp.Quantity * iwfp.FinancialProduct.Value:0.000}";
+
+        return query.ToListAsync();
     }
 }

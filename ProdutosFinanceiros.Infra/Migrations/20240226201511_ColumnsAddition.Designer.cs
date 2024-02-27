@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using ProdutosFinanceiros.Infra.Context;
 
@@ -11,9 +12,11 @@ using ProdutosFinanceiros.Infra.Context;
 namespace ProdutosFinanceiros.Infra.Migrations
 {
     [DbContext(typeof(MainContext))]
-    partial class MainContextModelSnapshot : ModelSnapshot
+    [Migration("20240226201511_ColumnsAddition")]
+    partial class ColumnsAddition
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -114,9 +117,6 @@ namespace ProdutosFinanceiros.Infra.Migrations
                     b.Property<Guid>("InvestmentWalletId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid>("InvestmentWalletId1")
-                        .HasColumnType("uniqueidentifier");
-
                     b.Property<string>("Name")
                         .HasColumnType("nvarchar(max)");
 
@@ -128,8 +128,6 @@ namespace ProdutosFinanceiros.Infra.Migrations
                     b.HasIndex("FinancialProductId");
 
                     b.HasIndex("InvestmentWalletId");
-
-                    b.HasIndex("InvestmentWalletId1");
 
                     b.ToTable("InvestmentWalletFinancialProduct");
                 });
@@ -200,12 +198,6 @@ namespace ProdutosFinanceiros.Infra.Migrations
                         .WithMany("WalletFinancialProduct")
                         .HasForeignKey("InvestmentWalletId")
                         .OnDelete(DeleteBehavior.NoAction)
-                        .IsRequired();
-
-                    b.HasOne("ProdutosFinanceiros.Domain.InvestmentWallet", "InvestmentWallet")
-                        .WithMany()
-                        .HasForeignKey("InvestmentWalletId1")
-                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("FinancialProduct");

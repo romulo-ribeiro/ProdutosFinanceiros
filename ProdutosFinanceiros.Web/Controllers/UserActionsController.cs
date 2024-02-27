@@ -35,15 +35,35 @@ namespace ProdutosFinanceiros.Web.Controllers
 
 
         [HttpPost("Buy")]
-        public async Task<IActionResult> Buy(Guid finProdId, int quantity)
+        public async Task<IActionResult> Buy(string username,Guid finProdId, int quantity)
         {
-            throw new NotImplementedException();
+            var user = (await _userService.GetByUsernameAsync(username)).Entity;
+            if (user == null)
+            {
+                return NotFound("Usuário não encontrado");
+            }
+            var result = await _investmentWalletService.Buy(user.Id, finProdId, quantity);
+            if (result == null)
+            {
+                return BadRequest("Erro ao comprar produto financeiro");
+            }
+            return Ok(result);            
         }
 
         [HttpPost("Sell")]
-        public async Task<IActionResult> Sell(Guid finProdId, int quantity)
+        public async Task<IActionResult> Sell(string username, Guid finProdId, int quantity)
         {
-            throw new NotImplementedException();
+            var user = (await _userService.GetByUsernameAsync(username)).Entity;
+            if (user == null)
+            {
+                return NotFound("Usuário não encontrado");
+            }
+            var result = await _investmentWalletService.Sell(user.Id, finProdId, quantity);
+            if (result == null)
+            {
+                return BadRequest("Erro ao vender produto financeiro");
+            }
+            return Ok(result);
         }
     }
 }
